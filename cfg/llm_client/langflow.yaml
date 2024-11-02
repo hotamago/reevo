@@ -1,0 +1,4 @@
+_target_: utils.llm_client.langflow.LangFlowClient
+
+api_url: ${oc.env:LANGFLOW_API_URL,http://localhost:7860}
+flow_id: ${oc.env:LANGFLOW_FLOW_ID,null}

@@ -25,8 +25,8 @@ def main(cfg):
         from utils.llm_client.langflow import LangFlowClient
 
         client = LangFlowClient(
-            BASE_API_URL="http://localhost:7860",
-            FLOW_ID="0f2e30d5-230c-468b-b5da-dcd59dd332b8",
+            BASE_API_URL=cfg.llm_client.api_url,
+            FLOW_ID=cfg.llm_client.flow_id,
             TWEAKS={},
         )
 
