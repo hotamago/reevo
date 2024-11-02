@@ -12,25 +12,48 @@ logging.basicConfig(level=logging.INFO)
 @hydra.main(version_base=None, config_path="cfg", config_name="config")
 def main(cfg):
     workspace_dir = Path.cwd()
-    # Set logging level
-    logging.info(f"Workspace: {workspace_dir}")
-    logging.info(f"Project Root: {ROOT_DIR}")
-    logging.info(f"Using LLM: {cfg.get('model', cfg.llm_client.model)}")
-    logging.info(f"Using Algorithm: {cfg.algorithm}")
+    lhh = None
 
-    client = init_client(cfg)
+    if cfg.algorithm == "hota":
+        # Set logging level
+        logging.info(f"Workspace: {workspace_dir}")
+        logging.info(f"Project Root: {ROOT_DIR}")
+        logging.info(f"Using Algorithm: {cfg.algorithm}")
 
-    if cfg.algorithm == "reevo":
-        from reevo import ReEvo as LHH
-    elif cfg.algorithm == "ael":
-        from baselines.ael.ga import AEL as LHH
-    elif cfg.algorithm == "eoh":
-        from baselines.eoh import EoH as LHH
+        from hota import HotaReEvo as LHH
+
+        from utils.llm_client.langflow import LangFlowClient
+
+        client = LangFlowClient(
+            BASE_API_URL="http://localhost:7860",
+            FLOW_ID="0f2e30d5-230c-468b-b5da-dcd59dd332b8",
+            TWEAKS={},
+        )
+
+        # Main algorithm
+        lhh = LHH(cfg, ROOT_DIR, client)
+
     else:
-        raise NotImplementedError
+        # Set logging level
+        logging.info(f"Workspace: {workspace_dir}")
+        logging.info(f"Project Root: {ROOT_DIR}")
+        logging.info(f"Using LLM: {cfg.get('model', cfg.llm_client.model)}")
+        logging.info(f"Using Algorithm: {cfg.algorithm}")
 
-    # Main algorithm
-    lhh = LHH(cfg, ROOT_DIR, client)
+        client = init_client(cfg)
+
+        if cfg.algorithm == "reevo":
+            from reevo import ReEvo as LHH
+        elif cfg.algorithm == "ael":
+            from baselines.ael.ga import AEL as LHH
+        elif cfg.algorithm == "eoh":
+            from baselines.eoh import EoH as LHH
+        else:
+            raise NotImplementedError
+
+        # Main algorithm
+        lhh = LHH(cfg, ROOT_DIR, client)
+        
     best_code_overall, best_code_path_overall = lhh.evolve()
     logging.info(f"Best Code Overall: {best_code_overall}")
     logging.info(f"Best Code Path Overall: {best_code_path_overall}")
