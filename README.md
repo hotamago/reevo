@@ -3,12 +3,12 @@
 
 Download image
 ```
-docker pull langflowai/langflow:latest
+docker pull langflowai/langflow:v1.1.0
 ```
 
 Install container
 ```
-docker create --name langflow-reevo -p 7860:7860 langflowai/langflow:latest
+docker create --name langflow-reevo -p 7860:7860 langflowai/langflow:v1.1.0
 ```
 
 Import demo flow graph using import function in langflow UI and import `langflow_json\TinhToanTienHoaDemo.json` file
