@@ -174,3 +174,4 @@ venv
 *.DS_Store
 exp/*
 ablation/*
+autorun_test.sh

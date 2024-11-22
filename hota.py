@@ -142,8 +142,8 @@ class HotaReEvo:
         self.population = self.evaluate_population([seed_ind])
 
         # If seed function is invalid, stop
-        if not self.seed_ind["exec_success"]:
-            raise RuntimeError(f"Seed function is invalid. Please check the stdout file in {os.getcwd()}.")
+        # if not self.seed_ind["exec_success"]:
+        #     raise RuntimeError(f"Seed function is invalid. Please check the stdout file in {os.getcwd()}.")
 
         self.update_iter()
 
@@ -152,6 +152,7 @@ class HotaReEvo:
         responses = self.client.run(self._create_prompt("init_population"))
         population_res = responses["population"]
         self.memory_variables = responses["set_variable"]
+        logging.info(f"Memory Variables: {self.memory_variables}")
         
         # Generate initial population
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(population_res)]
@@ -275,6 +276,8 @@ class HotaReEvo:
         """
         population = self.population
         objs = [individual["obj"] for individual in population]
+        if len(objs) == 0:
+            return
         best_obj, best_sample_idx = min(objs), np.argmin(np.array(objs))
         
         # update best overall
@@ -349,6 +352,7 @@ class HotaReEvo:
         responses = self.client.run(self._create_prompt("crossover", population))
         population_res = responses["population"]
         self.memory_variables = responses["set_variable"]
+        logging.info(f"Memory Variables: {self.memory_variables}")
         crossed_population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(population_res)]
 
         return crossed_population
@@ -360,6 +364,7 @@ class HotaReEvo:
         responses = self.client.run(self._create_prompt("mutate", self.population))
         population_res = responses["population"]
         self.memory_variables = responses["set_variable"]
+        logging.info(f"Memory Variables: {self.memory_variables}")
         population = [self.response_to_individual(response, response_id) for response_id, response in enumerate(population_res)]
         return population
 
@@ -367,8 +372,8 @@ class HotaReEvo:
     def evolve(self):
         while self.function_evals < self.cfg.max_fe:
             # If all individuals are invalid, stop
-            if all([not individual["exec_success"] for individual in self.population]):
-                raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
+            # if all([not individual["exec_success"] for individual in self.population]):
+            #     raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
             # Select
             population_to_select = self.population if (self.elitist is None or self.elitist in self.population) else [self.elitist] + self.population # add elitist to population for selection
             selected_population = self.rank_select(population_to_select)
